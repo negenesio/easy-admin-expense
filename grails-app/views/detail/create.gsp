@@ -1,38 +1,92 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta name="layout" content="main" />
-        <g:set var="entityName" value="${message(code: 'detail.label', default: 'Detail')}" />
-        <title><g:message code="default.create.label" args="[entityName]" /></title>
-    </head>
-    <body>
-        <a href="#create-detail" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-        <div class="nav" role="navigation">
-            <ul>
-                <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-                <li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
-            </ul>
-        </div>
-        <div id="create-detail" class="content scaffold-create" role="main">
-            <h1><g:message code="default.create.label" args="[entityName]" /></h1>
-            <g:if test="${flash.message}">
-            <div class="message" role="status">${flash.message}</div>
-            </g:if>
-            <g:hasErrors bean="${this.detail}">
-            <ul class="errors" role="alert">
-                <g:eachError bean="${this.detail}" var="error">
-                <li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
-                </g:eachError>
-            </ul>
-            </g:hasErrors>
-            <g:form resource="${this.detail}" method="POST">
-                <fieldset class="form">
-                    <f:all bean="detail"/>
-                </fieldset>
-                <fieldset class="buttons">
-                    <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-                </fieldset>
-            </g:form>
-        </div>
-    </body>
+<head>
+    <meta name="layout" content="main" />
+    <g:set var="entityName" value="${message(code: 'invoice.label', default: 'Invoice')}" />
+    <title><g:message code="default.create.label" args="[entityName]" /></title>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6 pb-5">
+    <!--Form with header-->
+        <g:form resource="${this.detail}" method="POST">
+            <div class="card border-primary rounded-0">
+                <div class="card-header p-0">
+                    <div class="bg-info text-white text-center py-2">
+                        <h3><i class="fa fa-shopping-cart"></i> Crear Detalle</h3>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <!--Body-->
+                    <div class="form-group">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="fa fa-drumstick-bite text-info"></i></div>
+                            </div>
+                            <select id="product" name="product" class="form-control selectpicker" title="Seleccione un Producto" data-live-search="true" style="background-color: #ccc;overflow-x: hidden; overflow-y: scroll;" required>
+                                <g:each in="${easy.admin.expense.Product.list()}">
+                                    <option value="${it?.id}">${it?.name}</option>
+                                </g:each>
+                            </select>
+                        </div>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="fa fa-calculator text-info"></i></div>
+                            </div>
+                            <input type="number" id="cant" name="cant" />
+                        </div>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="fa fa-money-bill-alt text-info"></i></div>
+                            </div>
+                            <input type="number" id="amount" name="amount" />
+                        </div>
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="fa fa-users text-info"></i></div>
+                            </div>
+                            <g:if test="${invoice?.id}">
+                                <input type="text" readonly value="${invoice.client.firstName +' '+invoice.client.surname}"/>
+                            </g:if>
+                            <g:else>
+                                <select id="invoice-select" name="invoice-select" class="form-control selectpicker" title="Seleccione una Factura" data-live-search="true" style="background-color: #ccc;overflow-x: hidden; overflow-y: scroll;" required>
+                                    <g:each in="${easy.admin.expense.Invoice.list()}">
+                                        <option value="${it?.id}">${it?.client.firstName+" "+it.client.surname+" - "+it.creationDate}</option>
+                                    </g:each>
+                                </select>
+                            </g:else>
+                            <input type="hidden" id="invoice" name="invoice" value="${invoice?.id}"/>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="text-center">
+                    <input type="submit" value="Crear siguiente Detalle" class="btn btn-info btn-block rounded-0 py-2">
+                </div>
+                <br>
+                <div class="text-center">
+                    <input type="submit" value="Finalizar Factura" class="btn btn-info btn-block rounded-0 py-2">
+                </div>
+            </div>
+
+            </div>
+        </g:form>
+    <!--Form with header-->
+    </div>
+</div>
+</div>
+<script>
+    $( document ).ready(function() {
+        var invoiceIdValue = $("#invoice").val();
+        if(invoiceIdValue) {
+            $("#invoice").val(invoiceIdValue);
+        } else {
+            $("#invoice-select").change(function () {
+                $("#invoice").val($("#invoice-select").val());
+            });
+        }
+    });
+</script>
+</body>
 </html>

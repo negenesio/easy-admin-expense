@@ -9,6 +9,18 @@ class InvoiceController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    def detailModal() {
+        String invoiceId = params.invoiceId
+        Invoice invoice = Invoice.findById(invoiceId)
+        List<Detail> details = Detail.findAllByInvoice(invoice)
+        render(view: "_detailModal", model:[detailList:details, invoice: invoice])
+    }
+
+    def administrator() {
+        List<Invoice> invoiceList = Invoice.findAll()
+        return [invoices:invoiceList]
+    }
+
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond invoiceService.list(params), model:[invoiceCount: invoiceService.count()]
@@ -23,25 +35,10 @@ class InvoiceController {
     }
 
     def save(Invoice invoice) {
-        if (invoice == null) {
-            notFound()
-            return
-        }
+        invoice.creationDate = new Date()
+        invoice.save()
 
-        try {
-            invoiceService.save(invoice)
-        } catch (ValidationException e) {
-            respond invoice.errors, view:'create'
-            return
-        }
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'invoice.label', default: 'Invoice'), invoice.id])
-                redirect invoice
-            }
-            '*' { respond invoice, [status: CREATED] }
-        }
+        redirect (action: 'create', controller: 'detail', params:[invoiceId:invoice.id])
     }
 
     def edit(Long id) {

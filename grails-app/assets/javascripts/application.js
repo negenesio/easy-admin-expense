@@ -5,10 +5,12 @@
 // You're free to add application-wide JavaScript to this file, but it's generally better
 // to create separate JavaScript files as needed.
 //
-//= require jquery-2.2.0.min
-//= require bootstrap
+//= require jquery-3.1.1.min
+//= require jquery-ui.min
 //= require_tree .
 //= require_self
+//= require bootstrap.bundle
+//= require js/fontawesome
 
 if (typeof jQuery !== 'undefined') {
     (function($) {

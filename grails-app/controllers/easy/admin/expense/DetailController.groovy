@@ -20,6 +20,8 @@ class DetailController {
 
     def create() {
         respond new Detail(params)
+        Invoice invoice = Invoice.findById(params.invoiceId)
+        return render(view: 'create', model:[invoice:invoice])
     }
 
     def save(Detail detail) {

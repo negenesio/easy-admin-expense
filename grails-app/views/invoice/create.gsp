@@ -6,33 +6,52 @@
         <title><g:message code="default.create.label" args="[entityName]" /></title>
     </head>
     <body>
-        <a href="#create-invoice" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-        <div class="nav" role="navigation">
-            <ul>
-                <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-                <li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
-            </ul>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6 pb-5">
+                <!--Form with header-->
+                <g:form resource="${this.invoice}" method="POST">
+                    <div class="card border-primary rounded-0">
+                        <div class="card-header p-0">
+                            <div class="bg-info text-white text-center py-2">
+                                <h3><i class="fa fa-file-invoice-dollar"></i> Crear Facturacion</h3>
+                            </div>
+                        </div>
+                        <div class="card-body p-3">
+                            <!--Body-->
+                            <div class="form-group">
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-users text-info"></i></div>
+                                    </div>
+                                    <select id="client" name="client" class="form-control selectpicker" title="Seleccione un CLiente" data-live-search="true" style="background-color: #ccc;overflow-x: hidden; overflow-y: scroll;" required>
+                                        <g:each in="${easy.admin.expense.Client.list()}">
+                                            <option value="${it?.id}">${it?.firstName+" "+it.surname}</option>
+                                        </g:each>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="text-center">
+                                <input type="submit" value="Crear Factura" class="btn btn-info btn-block rounded-0 py-2">
+                            </div>
+                        </div>
+
+                    </div>
+                </g:form>
+                <!--Form with header-->
+            </div>
         </div>
-        <div id="create-invoice" class="content scaffold-create" role="main">
-            <h1><g:message code="default.create.label" args="[entityName]" /></h1>
-            <g:if test="${flash.message}">
-            <div class="message" role="status">${flash.message}</div>
-            </g:if>
-            <g:hasErrors bean="${this.invoice}">
-            <ul class="errors" role="alert">
-                <g:eachError bean="${this.invoice}" var="error">
-                <li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
-                </g:eachError>
-            </ul>
-            </g:hasErrors>
-            <g:form resource="${this.invoice}" method="POST">
-                <fieldset class="form">
-                    <f:all bean="invoice"/>
-                </fieldset>
-                <fieldset class="buttons">
-                    <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-                </fieldset>
-            </g:form>
-        </div>
+    </div>
+   %{-- <input id="dateCreation" width="270" class="form-control" name="dateCreation" required/>
+
+
+    %{--<script>
+        $('#dateCreation').datepicker({
+            uiLibrary: 'bootstrap4'
+        });
+    </script>--}%
+
+
     </body>
 </html>
