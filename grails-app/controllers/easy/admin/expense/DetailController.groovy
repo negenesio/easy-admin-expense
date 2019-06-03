@@ -9,44 +9,43 @@ class DetailController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    def administrator() {
+        List<Detail> detailList = Detail.findAll()
+        return [detailList:detailList]
+    }
+
     def index(Integer max) {
+        println "DETAIL: [index: params:["+params.toString()+"]]"
         params.max = Math.min(max ?: 10, 100)
         respond detailService.list(params), model:[detailCount: detailService.count()]
     }
 
     def show(Long id) {
+        println "DETAIL: [show: params:["+params.toString()+"]]"
         respond detailService.get(id)
     }
 
     def create() {
+        println "DETAIL: [create: params:["+params.toString()+"]]"
         respond new Detail(params)
-        Invoice invoice = Invoice.findById(params.invoiceId)
+        Invoice invoice = Invoice.findById(params.invoiceIdResult)
         return render(view: 'create', model:[invoice:invoice])
     }
 
-    def save(Detail detail) {
-        if (detail == null) {
-            notFound()
-            return
-        }
-
-        try {
-            detailService.save(detail)
-        } catch (ValidationException e) {
-            respond detail.errors, view:'create'
-            return
-        }
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'detail.label', default: 'Detail'), detail.id])
-                redirect detail
-            }
-            '*' { respond detail, [status: CREATED] }
-        }
+    def save() {
+        println "DETAIL: [save: params:["+params.toString()+"]]"
+        Detail detail = new Detail()
+        detail.creationDate = new Date()
+        detail.cant = params.cant.toInteger()
+        detail.product = Product.findById(params.productId)
+        detail.amount = new BigDecimal(params.amount)
+        detail.invoice = Invoice.findById(params.invoiceIdResult)
+        detail.save(flush:true, failOnError:true)
+        return render(view: 'create', params:[invoiceIdResult:detail.invoice.id])
     }
 
     def edit(Long id) {
+        println "DETAIL: [edit: params:["+params.toString()+"]]"
         respond detailService.get(id)
     }
 

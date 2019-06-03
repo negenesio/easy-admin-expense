@@ -9,6 +9,11 @@ class ProductController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    def administrator() {
+        List<Product> productList = Product.findAll();
+        return [productList : productList]
+    }
+
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond productService.list(params), model:[productCount: productService.count()]
@@ -19,29 +24,12 @@ class ProductController {
     }
 
     def create() {
+        println "PRODUCT: [create: params:["+params.toString()+"]]"
         respond new Product(params)
     }
 
-    def save(Product product) {
-        if (product == null) {
-            notFound()
-            return
-        }
-
-        try {
-            productService.save(product)
-        } catch (ValidationException e) {
-            respond product.errors, view:'create'
-            return
-        }
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), product.id])
-                redirect product
-            }
-            '*' { respond product, [status: CREATED] }
-        }
+    def save() {
+        println "PRODUCT: [save: params:["+params.toString()+"]]"
     }
 
     def edit(Long id) {

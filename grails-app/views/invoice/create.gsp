@@ -2,16 +2,14 @@
 <html>
     <head>
         <meta name="layout" content="main" />
-        <g:set var="entityName" value="${message(code: 'invoice.label', default: 'Invoice')}" />
-        <title><g:message code="default.create.label" args="[entityName]" /></title>
     </head>
     <body>
     <div class="container">
-        <div class="row justify-content-center">
+        <div class="row justify-content-center" style="padding-top: 20px;">
             <div class="col-12 col-md-8 col-lg-6 pb-5">
                 <!--Form with header-->
                 <g:form resource="${this.invoice}" method="POST">
-                    <div class="card border-primary rounded-0">
+                    <div class="card rounded-0">
                         <div class="card-header p-0">
                             <div class="bg-info text-white text-center py-2">
                                 <h3><i class="fa fa-file-invoice-dollar"></i> Crear Facturacion</h3>
@@ -24,9 +22,14 @@
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-users text-info"></i></div>
                                     </div>
-                                    <select id="client" name="client" class="form-control selectpicker" title="Seleccione un CLiente" data-live-search="true" style="background-color: #ccc;overflow-x: hidden; overflow-y: scroll;" required>
+                                    <select id="client" name="client" class="form-control selectpicker" title="Seleccione un Cliente" data-live-search="true" style="background-color: #ccc;overflow-x: hidden; overflow-y: scroll;" required>
                                         <g:each in="${easy.admin.expense.Client.list()}">
-                                            <option value="${it?.id}">${it?.firstName+" "+it.surname}</option>
+                                            <g:if test="${params.clientId == it.id.toString()}">
+                                                <option selected value="${it?.id}">${it?.firstName+" "+it.surname}</option>
+                                            </g:if>
+                                            <g:else>
+                                                <option value="${it?.id}">${it?.firstName+" "+it.surname}</option>
+                                            </g:else>
                                         </g:each>
                                     </select>
                                 </div>
@@ -51,7 +54,6 @@
             uiLibrary: 'bootstrap4'
         });
     </script>--}%
-
 
     </body>
 </html>

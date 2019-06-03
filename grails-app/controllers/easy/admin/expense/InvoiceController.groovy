@@ -1,5 +1,6 @@
 package easy.admin.expense
 
+import easy.admin.expense.enums.InvoiceStatus
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
@@ -9,19 +10,50 @@ class InvoiceController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    def detailModal() {
-        String invoiceId = params.invoiceId
-        Invoice invoice = Invoice.findById(invoiceId)
+    def finish() {
+        println "INVOICE: [finish: params:["+params.toString()+"]]"
+        Invoice invoice = Invoice.findById(params.'invoice-select-finished');
+        invoice.status = InvoiceStatus.FINISHED
+        invoice.save(flush:true, failOnError:true)
+        if(invoice.hasErrors()){
+            invoice.errors.allErrors.each {
+                LOG.error("[FAIL-ERROR] [UPDATE INVOCE] - [MESSAGE: ${it}]")
+            }
+        }
+        redirect(action: "administrator", controller: "invoice")
+    }
+
+    def getDetaiLByInvoce() {
+        println "INVOICE: [getDetaiLByInvoce: params:["+params.toString()+"]]"
+        String invoiceIdResult = params.invoiceId
+        Invoice invoice = Invoice.findById(invoiceIdResult)
+
+        if(invoice == null) {
+            return null
+        }
+
         List<Detail> details = Detail.findAllByInvoice(invoice)
-        render(view: "_detailModal", model:[detailList:details, invoice: invoice])
+
+        if(details.isEmpty()) {
+            return null
+        }
+
+        BigDecimal total = 0;
+        details.each { detail ->
+            total += detail.amount * detail.cant
+        }
+
+        render(view: "/templates/_detailList", model:[detailList:details, invoice: invoice, total:total])
     }
 
     def administrator() {
+        println "INVOICE: [administrator: params:["+params.toString()+"]]"
         List<Invoice> invoiceList = Invoice.findAll()
         return [invoices:invoiceList]
     }
 
     def index(Integer max) {
+        println "INVOICE: [index: params:["+params.toString()+"]]"
         params.max = Math.min(max ?: 10, 100)
         respond invoiceService.list(params), model:[invoiceCount: invoiceService.count()]
     }
@@ -31,14 +63,17 @@ class InvoiceController {
     }
 
     def create() {
+        println "INVOICE: [create: params:["+params.toString()+"]]"
         respond new Invoice(params)
+        return [clientId:params.clientId]
     }
 
     def save(Invoice invoice) {
         invoice.creationDate = new Date()
-        invoice.save()
+        invoice.status = InvoiceStatus.PENDING
+        invoice.save(flush:true, failOnError:true)
 
-        redirect (action: 'create', controller: 'detail', params:[invoiceId:invoice.id])
+        redirect (action: 'create', controller: 'detail', params:[invoiceIdResult:invoice.id])
     }
 
     def edit(Long id) {
